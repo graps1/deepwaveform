@@ -74,3 +74,5 @@ def plot_pcl(df,
     ax.set_xlabel('X')
     ax.set_ylabel('Y')
     ax.set_zlabel('Z')
+
+    return fig,ax
