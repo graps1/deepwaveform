@@ -6,7 +6,7 @@ docs/build
 include
 lib
 distribute.egg-info
-setuptools.egg-info
+kplx_hansharder.egg-info
 .coverage
 .eggs
 .tox
