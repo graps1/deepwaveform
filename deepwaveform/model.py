@@ -1,18 +1,14 @@
 import torch
-from torch import nn
 import torch.nn.functional as F
+from torch.utils.data import DataLoader, Dataset, random_split
+from torch import nn
+
+from deepwaveform import waveform2matrix
 
 
 class ConvNet(nn.Module):
 
     def __init__(self, output_dimension=2):
-        """A simple one dimensional convolutional neural network.
-
-        :param output_dimension: Output dimension, i.e. the number of classes. 
-            Defaults to 2.
-        :type output_dimension: int, optional
-        """
-
         super(ConvNet, self).__init__()
         self.output_dimension = output_dimension
 
@@ -37,3 +33,20 @@ class ConvNet(nn.Module):
 
     def predict(self, x):
         return F.softmax(self(x).data, dim=1).numpy()
+
+class WaveFormDataset(Dataset):
+    def __init__(self, df, class_col="class", cutoff=64, wv_dim=200):
+        self.xs = waveform2matrix(df,wv_dim=wv_dim)[:,:cutoff]
+        self.xs = (self.xs - np.min(self.xs))/(np.max(self.xs)-np.min(self.xs)) # Normalize
+        self.xs = torch.tensor(self.xs).float() # to tensor
+        self.labels = torch.tensor(data[class_col].to_numpy())
+
+    def __len__(self):
+        return len(self.xs)
+
+    def __getitem__(self, idx):
+        if torch.is_tensor(idx):
+            idx = idx.tolist()
+
+        sample = { "waveform" : self.xs[idx], "label" : self.labels[idx] }
+        return sample

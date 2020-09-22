@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from matplotlib.colors import Normalize
 
-from .preprocessing import waveform2matrix
+from deepwaveform import waveform2matrix
 
 
 def plot_waveforms(df,
