@@ -3,6 +3,7 @@
 * setuptools
 * pandas
 * matplotlib
+* numpy
 * python >=3.5
 * für die Beispiele: jupyter notebook
 
