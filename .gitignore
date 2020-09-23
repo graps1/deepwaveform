@@ -21,4 +21,4 @@ deepwaveform.egg-info
 .pytest_cache/
 .mypy_cache/
 examples/model_classifier.pt
-data
+data/*
