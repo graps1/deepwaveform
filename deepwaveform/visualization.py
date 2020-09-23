@@ -75,3 +75,47 @@ def plot_pcl(df,
     ax.set_ylabel('Y')
     ax.set_zlabel('Z')
     plt.show()
+
+
+def plot_training_progress(stats, figsize=(12, 6)):
+    fig = plt.figure(figsize=figsize)
+    ax = fig.add_subplot(111)
+    xs = np.arange(len(stats))
+    ys = np.array([stat["meanloss"] for stat in stats])
+    ys_sd = np.array([stat["varloss"] for stat in stats])**0.5
+    ax.plot(xs, ys, color="red")
+    ax.fill_between(xs, ys-0.5*ys_sd, ys+0.5*ys_sd, color="red", alpha=0.2)
+    ax.set_xlabel("epoch")
+    ax.set_ylabel("mean loss")
+    plt.show()
+
+
+def plot_confusion_matrix(model,
+                          dataset,
+                          classidx_to_name={0: "Land", 1: "Water"}):
+    wf, lab = dataset[:]["waveform"], dataset[:]["label"].numpy()
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    cf_mat = np.zeros(shape=(model.output_dimension, model.output_dimension))
+
+    for idx, row in enumerate(model.predict(wf)):
+        predicted = np.argmax(row, axis=0)
+        correct = lab[idx]
+        cf_mat[predicted, correct] += 1
+
+    for i in range(model.output_dimension):
+        cf_mat[:, i] = cf_mat[:, i]/np.sum(cf_mat[:, i])
+
+    for i in range(model.output_dimension):
+        for j in range(model.output_dimension):
+            p = cf_mat[i, j]
+            ax.text(j, i, "%.3f" % p, va="center", ha="center")
+
+    ax.matshow(cf_mat, cmap=cm.coolwarm)
+    ax.set_yticks(range(cf_mat.shape[0]))
+    ax.set_yticklabels(["%s (predicted)" % classidx_to_name[idx] for
+                        idx in range(cf_mat.shape[0])])
+    ax.set_xticks(range(cf_mat.shape[0]))
+    ax.set_xticklabels(["%s (true)" % classidx_to_name[idx] for
+                        idx in range(cf_mat.shape[0])])
+    plt.show()
