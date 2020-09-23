@@ -48,6 +48,53 @@ class ConvNet(nn.Module):
             df[label] = pred[:, idx]
 
 
+class AutoEncoder(nn.Module):
+    def __init__(self, dimensions=5):
+        super(AutoEncoder, self).__init__()
+        self.dimensions = dimensions
+
+        self.encode = nn.Sequential(
+            nn.Linear(64, 32),
+            nn.ReLU(inplace=True),
+            nn.Linear(32, 16),
+            nn.ReLU(inplace=True)
+        )
+
+        self.h = nn.Sequential(
+            nn.Linear(16, dimensions),
+            nn.ReLU(inplace=True)
+        )
+
+        self.decode = nn.Sequential(
+            nn.Linear(dimensions, 16),
+            nn.ReLU(inplace=True),
+            nn.Linear(16, 32),
+            nn.ReLU(inplace=True)
+        )
+
+        self.output = nn.Sequential(
+            nn.Linear(32, 64)
+        )
+
+    def encoder(self, x):
+        out = self.encode(x)
+        out = out.view(out.size(0), -1)
+        out = self.h(out)
+        return out
+
+    def decoder(self, x):
+        out = x.view(x.size(0), 1, x.size(1))
+        out = self.decode(out)
+        out = out.view(out.size(0), -1)
+        out = self.output(out)
+        return out
+
+    def forward(self, x):
+        out = self.encoder(x)
+        out = self.decoder(out)
+        return out
+
+
 class WaveFormDataset(Dataset):
     def __init__(self,
                  df,

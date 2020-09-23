@@ -11,7 +11,7 @@
 Unter Linux: `sudo python3 setup.py install` aufrufen.
 
 ## Benutzung
-
+### Command Line Tool
 ### Beispiele
 Um die Beispiele ausführen zu können, müssen zuerst ein paar Datensätze heruntergeladen werden. Dazu kann (unter Linux) `download_data.sh` ausgeführt werden. Die Datensätze werden in diesem Fall in dem Unterordner `./data` gespeichert. Unter Windows kann diese [.zip-Datei](https://cloudstore.zih.tu-dresden.de/index.php/s/cq9Wra6PERtFCKf/download) heruntergeladen und dann im `./data`-Ordner entpackt werden.
 
@@ -27,3 +27,12 @@ Um die Beispiele ausführen zu können, müssen zuerst ein paar Datensätze heru
 * Speichern und Laden eines trainierten Modells
 * Annotieren eines Datensatzes mit den vorhergesagten Klassen
 * Plotten der Punktwolke mit den vorhergesagten Wahrscheinlichkeiten
+
+## Todo
+* Windows-Installation
+* Command Line Tool; benutzbar unter Windows
+* Kommentare / Github-Seite via Sphinx aufsetzen
+* Clustering
+    * K-Means (scikit-learn)
+    * via Autoencoder
+    * Notebook
