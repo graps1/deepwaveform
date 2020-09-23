@@ -77,7 +77,7 @@ class AutoEncoder(nn.Module):
         )
 
     def encoder(self, x):
-        out = self.encode(x)
+        out = self.encode(x.unsqueeze(1))
         out = out.view(out.size(0), -1)
         out = self.h(out)
         return out
@@ -167,9 +167,20 @@ class Trainer:
             yield result
 
     def train_classifier(self):
-        loss = nn.CrossEntropyLoss()
+        cel = nn.CrossEntropyLoss()
 
         def criterion(wfs, labels):
-            return loss(self.model(wfs), labels)
+            return cel(self.model(wfs), labels)
+
+        return self._train(criterion)
+
+    def train_autoencoder(self, sparsity=0):
+        msel = nn.MSELoss()
+        l1l = nn.L1Loss()
+
+        def criterion(wfs, labels):
+            hidden = self.model.encoder(wfs)
+            modeloutput = self.model.decoder(hidden)
+            return msel(modeloutput, wfs) + sparsity*l1l(hidden, 0)
 
         return self._train(criterion)
