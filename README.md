@@ -20,7 +20,7 @@ Um die Beispiele ausführen zu können, müssen zuerst ein paar Datensätze heru
 * Plotten der Punktwolke
 * Plotten von Waveforms
 
-`examples/train_classifier.ipynby`:
+`examples/classifier.ipynby`:
 * Trainieren eines Klassifikators (Convolutional Neural Networks) auf einem gegebenen Datensatz
 * Visualisieren von Trainingszwischenergebnissen
 * Plotten der Confusion Matrix des Klassifikators über den Datensatz
