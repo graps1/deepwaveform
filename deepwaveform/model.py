@@ -35,20 +35,31 @@ class ConvNet(nn.Module):
     def predict(self, x):
         return F.softmax(self(x).data, dim=1).numpy()
 
+    def process_dataframe(self, df, wv_cols=list(range(64)),
+                          class_label_mapping=["Land", "Water"],
+                          predicted_column="Predicted"):
+        # adds new columns to dataframe
+        ds = WaveFormDataset(df,
+                             classcol=None,
+                             wv_cols=wv_cols)
+        pred = self.predict(ds[:]["waveform"])
+        df[predicted_column] = np.argmax(pred, axis=1)
+        for idx, label in enumerate(class_label_mapping):
+            df[label] = pred[:, idx]
+
 
 class WaveFormDataset(Dataset):
     def __init__(self,
                  df,
                  classcol="class",
-                 cutleft=0,
-                 cutright=64,
-                 wv_dim=200):
+                 wv_cols=list(range(64))):
         super(WaveFormDataset, self).__init__()
-        datamatrix = waveform2matrix(df, wv_dim=wv_dim)[:, cutleft:cutright]
+        datamatrix = waveform2matrix(df, wv_cols=wv_cols)
         mi, ma = np.min(datamatrix), np.max(datamatrix)
         self.xs = (datamatrix - mi)/(ma-mi)         # Normalize
         self.xs = torch.tensor(self.xs).float()     # to tensor
-        self.labels = torch.tensor(df[classcol].to_numpy())
+        self.labels = torch.tensor(df[classcol].to_numpy()) if \
+            classcol is not None else [0]*len(self.xs)
 
     def __len__(self):
         return len(self.xs)
@@ -66,11 +77,9 @@ class Trainer:
                  model,
                  dataset,
                  optimizer=None,
-                 ptrain=0.9,
                  batch_size=128,
                  epochs=20):
         self.model = model
-        self.ptrain = ptrain
         self.batch_size = batch_size
         self.epochs = epochs
         self.dataset = dataset
@@ -82,13 +91,8 @@ class Trainer:
 
     def _train(self, criterion):
 
-        train_size = int(len(self.dataset)*self.ptrain)
-        train_dataset, test_dataset = random_split(
-            self.dataset,
-            [train_size, len(self.dataset) - train_size])
-
         train_loader = DataLoader(
-            dataset=train_dataset,
+            dataset=self.dataset,
             batch_size=self.batch_size,
             shuffle=True)
 
