@@ -20,5 +20,5 @@ deepwaveform.egg-info
 .idea/
 .pytest_cache/
 .mypy_cache/
-examples/model_classifier.pt
+examples/model_classifier\.pt
 data
