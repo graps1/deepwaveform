@@ -1,6 +1,6 @@
 import torch
 import torch.nn.functional as F
-from torch.utils.data import DataLoader, Dataset, random_split
+from torch.utils.data import DataLoader, Dataset
 from torch import nn
 
 import numpy as np
@@ -56,43 +56,46 @@ class AutoEncoder(nn.Module):
         self.encode = nn.Sequential(
             nn.Linear(64, 32),
             nn.ReLU(inplace=True),
-            nn.Linear(32, 16),
-            nn.ReLU(inplace=True)
-        )
-
-        self.h = nn.Sequential(
-            nn.Linear(16, dimensions),
+            nn.Linear(32, dimensions),
             nn.ReLU(inplace=True)
         )
 
         self.decode = nn.Sequential(
-            nn.Linear(dimensions, 16),
+            nn.Linear(dimensions, 32),
             nn.ReLU(inplace=True),
-            nn.Linear(16, 32),
-            nn.ReLU(inplace=True)
-        )
-
-        self.output = nn.Sequential(
             nn.Linear(32, 64)
         )
 
     def encoder(self, x):
-        out = self.encode(x.unsqueeze(1))
-        out = out.view(out.size(0), -1)
-        out = self.h(out)
+        if len(x.size()) == 2:
+            x = x.unsqueeze(1)
+        out = self.encode(x)
         return out
 
     def decoder(self, x):
-        out = x.view(x.size(0), 1, x.size(1))
-        out = self.decode(out)
-        out = out.view(out.size(0), -1)
-        out = self.output(out)
+        if len(x.size()) == 2:
+            x = x.unsqueeze(1)
+        out = self.decode(x)
         return out
 
     def forward(self, x):
         out = self.encoder(x)
         out = self.decoder(out)
         return out
+
+    def process_dataframe(self, df, wv_cols=list(range(64)),
+                          encoding_prefix="hidden_",
+                          reconstruction_prefix="reconstr_"):
+        ds = WaveFormDataset(df, classcol=None, wv_cols=list(range(64)))
+        hidden = self.encoder(ds[:]["waveform"])
+        output = self.decoder(hidden).detach().numpy()
+        hidden = hidden.detach().numpy()
+        # denormalize
+        output = output*(ds.ma-ds.mi)+ds.mi
+        for idx in range(hidden.shape[2]):
+            df["%s%d" % (encoding_prefix, idx)] = hidden[:, 0, idx]
+        for idx, wv in enumerate(wv_cols):
+            df["%s%s" % (reconstruction_prefix, wv)] = output[:, 0, idx]
 
 
 class WaveFormDataset(Dataset):
@@ -102,8 +105,8 @@ class WaveFormDataset(Dataset):
                  wv_cols=list(range(64))):
         super(WaveFormDataset, self).__init__()
         datamatrix = waveform2matrix(df, wv_cols=wv_cols)
-        mi, ma = np.min(datamatrix), np.max(datamatrix)
-        self.xs = (datamatrix - mi)/(ma-mi)         # Normalize
+        self.mi, self.ma = np.min(datamatrix), np.max(datamatrix)
+        self.xs = (datamatrix - self.mi)/(self.ma-self.mi)         # Normalize
         self.xs = torch.tensor(self.xs).float()     # to tensor
         self.labels = torch.tensor(df[classcol].to_numpy()) if \
             classcol is not None else [0]*len(self.xs)
@@ -160,7 +163,7 @@ class Trainer:
 
                 sum_xi += loss.item()
                 sum_xi_squared += loss.item()**2
-                varloss = 1/(i+1)*(sum_xi_squared - sum_xi/(i+1))
+                varloss = max(0, 1/(i+1)*(sum_xi_squared - sum_xi/(i+1)))
                 meanloss = meanloss + (loss.item() - meanloss)/(i+1)
 
             result = {"meanloss": meanloss, "varloss": varloss}
@@ -179,8 +182,11 @@ class Trainer:
         l1l = nn.L1Loss()
 
         def criterion(wfs, labels):
+            if len(wfs.size()) == 2:
+                wfs = wfs.unsqueeze(1)
             hidden = self.model.encoder(wfs)
             modeloutput = self.model.decoder(hidden)
-            return msel(modeloutput, wfs) + sparsity*l1l(hidden, 0)
+            return msel(modeloutput, wfs) +\
+                sparsity*l1l(hidden, torch.zeros(size=hidden.size()))
 
         return self._train(criterion)
