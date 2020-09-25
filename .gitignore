@@ -22,4 +22,4 @@ deepwaveform.egg-info
 .mypy_cache/
 data/*
 .ipynb_checkpoints
-docs/
+docs/_build/*
