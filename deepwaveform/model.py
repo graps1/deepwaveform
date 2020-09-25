@@ -9,25 +9,39 @@ from deepwaveform import waveform2matrix
 
 
 class ConvNet(nn.Module):
-    def __init__(self, output_dimension=2):
+    def __init__(self,
+                 input_dimension=64,
+                 output_dimension=2,
+                 layer1=(5, 9),
+                 layer2=(5, 15)):
+        assert layer1[1] % 2 != 0, "kernel size must be uneven"
+        assert layer2[1] % 2 != 0, "kernel size must be uneven"
+        assert input_dimension % 4 == 0, "input dimension not divisible by 4"
+
         super(ConvNet, self).__init__()
         self.output_dimension = output_dimension
 
         self.features = nn.Sequential(
-            nn.Conv1d(1, 8, kernel_size=9, padding=4),
+            nn.Conv1d(1, layer1[0],
+                      kernel_size=layer1[1],
+                      padding=int(layer1[1]/2)),
             nn.ReLU(inplace=True),
             nn.MaxPool1d(kernel_size=2, stride=2),
-            nn.Conv1d(8, 8, kernel_size=5, padding=2),
+            nn.Conv1d(layer1[0], layer2[0],
+                      kernel_size=layer2[1],
+                      padding=int(layer2[1]/2)),
             nn.ReLU(inplace=True),
             nn.MaxPool1d(kernel_size=2, stride=2)
         )
 
         self.classifier = nn.Sequential(
-            nn.Linear(8*16, output_dimension),
+            nn.Linear(layer2[0]*(input_dimension/4), output_dimension),
         )
-        
+
     def forward(self, x):
-        out = self.features(x.unsqueeze(1))
+        if len(x.size()) == 2:
+            x = x.unsqueeze(1)
+        out = self.features(x)
         out = torch.flatten(out, 1)
         out = self.classifier(out)
         return out
@@ -35,9 +49,9 @@ class ConvNet(nn.Module):
     def predict(self, x):
         return F.softmax(self(x).data, dim=1).numpy()
 
-    def process_dataframe(self, df, wv_cols=list(range(64)),
-                          class_label_mapping=["Land", "Water"],
-                          predicted_column="Predicted"):
+    def annotate_dataframe(self, df, wv_cols=list(range(64)),
+                           class_label_mapping=["Land", "Water"],
+                           predicted_column="Predicted"):
         # adds new columns to dataframe
         ds = WaveFormDataset(df,
                              classcol=None,
@@ -49,21 +63,21 @@ class ConvNet(nn.Module):
 
 
 class AutoEncoder(nn.Module):
-    def __init__(self, dimensions=5):
+    def __init__(self, layer1=64, layer2=32, hidden=5):
         super(AutoEncoder, self).__init__()
-        self.dimensions = dimensions
+        self.hiddensize = hidden
 
         self.encode = nn.Sequential(
-            nn.Linear(64, 32),
+            nn.Linear(layer1, layer2),
             nn.ReLU(inplace=True),
-            nn.Linear(32, dimensions),
+            nn.Linear(layer2, hidden),
             nn.ReLU(inplace=True)
         )
 
         self.decode = nn.Sequential(
-            nn.Linear(dimensions, 32),
+            nn.Linear(hidden, layer2),
             nn.ReLU(inplace=True),
-            nn.Linear(32, 64)
+            nn.Linear(layer2, layer1)
         )
 
     def encoder(self, x):
@@ -83,16 +97,16 @@ class AutoEncoder(nn.Module):
         out = self.decoder(out)
         return out
 
-    def process_dataframe(self, df, wv_cols=list(range(64)),
-                          encoding_prefix="hidden_",
-                          reconstruction_prefix="reconstr_"):
+    def annotate_dataframe(self, df, wv_cols=list(range(64)),
+                           encoding_prefix="hidden_",
+                           reconstruction_prefix="reconstr_"):
         ds = WaveFormDataset(df, classcol=None, wv_cols=list(range(64)))
         hidden = self.encoder(ds[:]["waveform"])
         output = self.decoder(hidden).detach().numpy()
         hidden = hidden.detach().numpy()
         # denormalize
         output = output*(ds.ma-ds.mi)+ds.mi
-        for idx in range(hidden.shape[2]):
+        for idx in range(self.hiddensize):
             df["%s%d" % (encoding_prefix, idx)] = hidden[:, 0, idx]
         for idx, wv in enumerate(wv_cols):
             df["%s%s" % (reconstruction_prefix, wv)] = output[:, 0, idx]
