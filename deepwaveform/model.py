@@ -14,6 +14,19 @@ class ConvNet(nn.Module):
                  output_dimension=2,
                  layer1=(5, 9),
                  layer2=(5, 15)):
+        """Initializes a simple one dimensional CNN with two layers.
+
+        :param input_dimension: Length of a waveform, defaults to 64
+        :type input_dimension: int, optional
+        :param output_dimension: Number of classes, defaults to 2
+        :type output_dimension: int, optional
+        :param layer1: (number kernels of first layer, kernel sizes),
+            defaults to (5, 9)
+        :type layer1: tuple, optional
+        :param layer2: (number of kernels of second layer, kernel sizes),
+            defaults to (5, 15)
+        :type layer2: tuple, optional
+        """
         assert layer1[1] % 2 != 0, "kernel size must be uneven"
         assert layer2[1] % 2 != 0, "kernel size must be uneven"
         assert input_dimension % 4 == 0, "input dimension not divisible by 4"
@@ -52,6 +65,21 @@ class ConvNet(nn.Module):
     def annotate_dataframe(self, df, wv_cols=list(range(64)),
                            class_label_mapping=["Land", "Water"],
                            predicted_column="Predicted"):
+        """Annotates a dataframe containing waveforms with the estimated
+        classes and respective probability estimates.
+
+        :param df: Dataframe with waveforms
+        :type df: pandas.DataFrame
+        :param wv_cols: List of column names containing the waveforms,
+            defaults to list(range(64))
+        :type wv_cols: list, optional
+        :param class_label_mapping: New columns for probability estimates,
+            defaults to ["Land", "Water"]
+        :type class_label_mapping: list, optional
+        :param predicted_column: New column for class estimates,
+            defaults to "Predicted"
+        :type predicted_column: str, optional
+        """
         # adds new columns to dataframe
         ds = WaveFormDataset(df,
                              classcol=None,
@@ -64,6 +92,16 @@ class ConvNet(nn.Module):
 
 class AutoEncoder(nn.Module):
     def __init__(self, layer1=64, layer2=32, hidden=5):
+        """A simple symmetric Autoencoder with 2 encoding layers,
+        one hidden and 2 decoding layers.
+
+        :param layer1: Dimension of first/last layer, defaults to 64
+        :type layer1: int, optional
+        :param layer2: Dimension of second/fourth, defaults to 32
+        :type layer2: int, optional
+        :param hidden: Dimension of hidden layer, defaults to 5
+        :type hidden: int, optional
+        """
         super(AutoEncoder, self).__init__()
         self.hiddensize = hidden
 
@@ -100,6 +138,21 @@ class AutoEncoder(nn.Module):
     def annotate_dataframe(self, df, wv_cols=list(range(64)),
                            encoding_prefix="hidden_",
                            reconstruction_prefix="reconstr_"):
+        """Annotates a dataframe with the estimated encoding and
+        the corresponding reconstruction.
+
+        :param df: Dataframe with waveforms
+        :type df: pandas.DataFrame
+        :param wv_cols: List of column names containing waveforms,
+            defaults to list(range(64))
+        :type wv_cols: list, optional
+        :param encoding_prefix: Prefix of new columns containing encoding,
+            defaults to "hidden\_"
+        :type encoding_prefix: str, optional
+        :param reconstruction_prefix: Prefix of new columns containing
+            reconstruction, defaults to "reconstr\_"
+        :type reconstruction_prefix: str, optional
+        """
         ds = WaveFormDataset(df, classcol=None, wv_cols=list(range(64)))
         hidden = self.encoder(ds[:]["waveform"])
         output = self.decoder(hidden).detach().numpy()
@@ -113,15 +166,25 @@ class AutoEncoder(nn.Module):
 
 
 class WaveFormDataset(Dataset):
-    def __init__(self,
-                 df,
-                 classcol="class",
-                 wv_cols=list(range(64))):
+
+    def __init__(self, df, classcol="class", wv_cols=list(range(64))):
+        """Initializes a dataset that can be processed by neural networks.
+
+        :param df: The dataframe containing the waveforms
+        :type df: pandas.DataFrame
+        :param classcol: Column in dataframe containing class of waveform.
+            If `None` then class of waveform is ignored -- e.g. when it comes
+            to autoencoders, defaults to "class"
+        :type classcol: str, optional
+        :param wv_cols: Columns dataframe containing waveforms,
+            defaults to list(range(64))
+        :type wv_cols: list, optional
+        """
         super(WaveFormDataset, self).__init__()
         datamatrix = waveform2matrix(df, wv_cols=wv_cols)
         self.mi, self.ma = np.min(datamatrix), np.max(datamatrix)
-        self.xs = (datamatrix - self.mi)/(self.ma-self.mi)         # Normalize
-        self.xs = torch.tensor(self.xs).float()     # to tensor
+        self.xs = (datamatrix - self.mi)/(self.ma-self.mi)
+        self.xs = torch.tensor(self.xs).float()
         self.labels = torch.tensor(df[classcol].to_numpy()) if \
             classcol is not None else [0]*len(self.xs)
 
@@ -143,6 +206,20 @@ class Trainer:
                  optimizer=None,
                  batch_size=128,
                  epochs=20):
+        """Initializes a trainer for a neural network.
+
+        :param model: The model
+        :type model: deepwaveform.ConvNet or deepwaveform.AutoEncoder
+        :param dataset: The dataset the model should be trained on
+        :type dataset: deepwaveform.WaveFormDataset
+        :param optimizer: The optimizer that should be used. If None,
+            then Adam is used, defaults to None
+        :type optimizer: torch.optim.Optimizer, optional
+        :param batch_size: The batch size used for training, defaults to 128
+        :type batch_size: int, optional
+        :param epochs: The number of epochs used for training, defaults to 20
+        :type epochs: int, optional
+        """
         self.model = model
         self.batch_size = batch_size
         self.epochs = epochs
@@ -184,6 +261,13 @@ class Trainer:
             yield result
 
     def train_classifier(self):
+        """Trains a classifier over the dataset.
+
+        :return: An iterator over the results of each epoch. Each
+            result is given as a dictionary with keys "meanloss"
+            and "varloss"
+        :rtype: Iterator[Dict]
+        """
         cel = nn.CrossEntropyLoss()
 
         def criterion(wfs, labels):
@@ -192,6 +276,16 @@ class Trainer:
         return self._train(criterion)
 
     def train_autoencoder(self, sparsity=0):
+        """Trains an autoencoder over the dataset.
+
+        :param sparsity: multiplier for l1 penalty on the hidden layer,
+            defaults to 0
+        :type sparsity: int, optional
+        :return: An iterator over the results of each epoch. Each
+            result is given as a dictionary with keys "meanloss"
+            and "varloss"
+        :rtype: Iterator[Dict]
+        """
         msel = nn.MSELoss()
         l1l = nn.L1Loss()
 

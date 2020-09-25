@@ -12,6 +12,23 @@ def plot_waveforms(df,
                    class_label_mapping=["Land", "Water"],
                    class_style_mapping=["g-", "b--"],
                    wv_cols=list(range(64))):
+    """Plots the waveforms of a dataframe.
+
+    :param df: The dataframe containing the waveforms.
+    :type df: pandas.DataFrame
+    :param axis: The matplotlib-axis the waveforms should be plotted on
+    :type axis: matplotlib.axes.Axes
+    :param classcol: Column containing class of waveform, defaults to "class"
+    :type classcol: str, optional
+    :param class_label_mapping: List linking class index and class names,
+        defaults to ["Land", "Water"]
+    :type class_label_mapping: list, optional
+    :param class_style_mapping: List linking class index and waveform style,
+        defaults to ["g-", "b--"]
+    :type class_style_mapping: list, optional
+    :param wv_cols: Columns containing waveforms, defaults to list(range(64))
+    :type wv_cols: List, optional
+    """
     # get waveforms in matrix form
     waveforms = waveform2matrix(df, wv_cols=wv_cols)
     # set up figure
@@ -49,6 +66,24 @@ def plot_pcl(df,
              xcol="x",
              ycol="y",
              zcol="z"):
+    """Plots a pointcloud from a dataframe.
+
+    :param df: dataframe containing points
+    :type df: pandas.DataFrame
+    :param axis: The matplotlib-axis the pointcloud should be plotted on
+    :type axis: matplotlib.axes.Axes
+    :param targetcol: Column containing class of waveform, defaults to "class"
+    :type targetcol: str, optional
+    :param colormap: Colormap mapping class index to color,
+        defaults to cm.coolwarm
+    :type colormap: matplotlib.colors.Colormap, optional
+    :param xcol: Column containing x-position, defaults to "x"
+    :type xcol: str, optional
+    :param ycol: Column containing y-position, defaults to "y"
+    :type ycol: str, optional
+    :param zcol: Column containing z-position, defaults to "z"
+    :type zcol: str, optional
+    """
     # initialize 3d-plot
     norm = Normalize(min(df[targetcol]), max(df[targetcol]))
 
@@ -75,15 +110,28 @@ def plot_pcl_prediction(df,
                         colors=["green", "blue"],
                         xcol="x",
                         ycol="y",
-                        zcol="z",
-                        sigmoid_scaling=False,
-                        sigmoid_scaling_factor=1):
-    def sigmoid(x):
-        return 1/(np.exp(-x)+1)
-    probarr = np.array(df[probabilities_col])
-    if sigmoid_scaling:
-        probarr = sigmoid(sigmoid_scaling_factor*(2*probarr-1))
+                        zcol="z"):
+    """Plots the pointcloud of a dataframe with interpolated coloring,
+    dependent on probability estimates of corresponding classes.
 
+    :param df: dataframe containing points and probability estimates.
+    :type df: pandas.DataFrame
+    :param axis: The matplotlib-axis the pointcloud should be plotted on
+    :type axis: matplotlib.axes.Axes
+    :param probabilities_col: Columns with probability estimates,
+        defaults to ["Land", "Water"]
+    :type probabilities_col: list, optional
+    :param colors: Colors associates with probability estimates,
+        defaults to ["green", "blue"]
+    :type colors: list, optional
+    :param xcol: Column containing x-position, defaults to "x"
+    :type xcol: str, optional
+    :param ycol: Column containing y-position, defaults to "y"
+    :type ycol: str, optional
+    :param zcol: Column containing z-position, defaults to "z"
+    :type zcol: str, optional
+    """
+    probarr = np.array(df[probabilities_col])
     # linear interpolation between colors
     rgba_colors = np.array([to_rgba(color) for color in colors])
     colorsarr = np.zeros(shape=(df.shape[0], 4))
@@ -115,6 +163,15 @@ def plot_pcl_prediction(df,
 
 
 def plot_training_progress(stats, axis):
+    """Plots the training process of a network over time.
+
+    :param stats: List of dictionaries, containing entries for
+        "meanloss" and "varloss".
+    :type stats: List[Dict]
+    :param axis: The matplotlib-axis the training process should be
+        plotted on.
+    :type axis: matplotlib.axes.Axes
+    """
     xs = np.arange(len(stats))
     ys = np.array([stat["meanloss"] for stat in stats])
     ys_sd = np.array([stat["varloss"] for stat in stats])**0.5
@@ -128,6 +185,18 @@ def plot_confusion_matrix(model,
                           axis,
                           dataset,
                           class_label_mapping=["Land", "Water"]):
+    """Plots the confusion matrix of a classifier w.r.t. a dataset.
+
+    :param model: The classifier
+    :type model: deepwaveform.ConvNet
+    :param axis: The matplotlib-axis the confusion matrix should be plotted on
+    :type axis: matplotlib.axes.Axes
+    :param dataset: The dataset
+    :type dataset: deepwaveform.WaveFormDataset
+    :param class_label_mapping: List linking class indices to class names,
+        defaults to ["Land", "Water"]
+    :type class_label_mapping: list, optional
+    """
     wf, lab = dataset[:]["waveform"], dataset[:]["label"].numpy()
     cf_mat = np.zeros(shape=(model.output_dimension, model.output_dimension))
 
