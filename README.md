@@ -1,3 +1,6 @@
+## Dokumentation
+Kann unter https://graps1.github.io/deepwaveform/_build/html/index.html gefunden werden.
+
 ## Abhängigkeiten
 * pytorch
 * setuptools
@@ -45,4 +48,3 @@ Um die Beispiele ausführen zu können, müssen zuerst ein paar Datensätze heru
 ## Todo
 * Windows-Installation
 * Command Line Tool; benutzbar unter Windows
-* Kommentare / Github-Seite via Sphinx aufsetzen
