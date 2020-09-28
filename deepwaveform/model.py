@@ -81,7 +81,8 @@ class ConvNet(nn.Module):
         :type predicted_column: str, optional
         """
         if class_label_mapping is None:
-            class_label_mapping = ["pred_%d" % idx for idx in range(self.output_dimension)]
+            class_label_mapping = [
+                "pred_%d" % idx for idx in range(self.output_dimension)]
 
         # adds new columns to dataframe
         ds = WaveFormDataset(df,
@@ -98,9 +99,9 @@ class AutoEncoder(nn.Module):
         """A simple symmetric Autoencoder with 2 encoding layers,
         one hidden and 2 decoding layers.
 
-        :param layer1: Dimension of first/last layer, defaults to 64
+        :param layer1: Dimension of first/fifth layer, defaults to 64
         :type layer1: int, optional
-        :param layer2: Dimension of second/fourth, defaults to 32
+        :param layer2: Dimension of second/fourth layer, defaults to 32
         :type layer2: int, optional
         :param hidden: Dimension of hidden layer, defaults to 5
         :type hidden: int, optional
@@ -156,7 +157,8 @@ class AutoEncoder(nn.Module):
             reconstruction, defaults to "reconstr\_"
         :type reconstruction_prefix: str, optional
         """
-        ds = WaveFormDataset(df, classcol=None, wv_cols=list(map(str, range(64))))
+        ds = WaveFormDataset(df, classcol=None,
+                             wv_cols=list(map(str, range(64))))
         hidden = self.encoder(ds[:]["waveform"])
         output = self.decoder(hidden).detach().numpy()
         hidden = hidden.detach().numpy()
@@ -170,7 +172,10 @@ class AutoEncoder(nn.Module):
 
 class WaveFormDataset(Dataset):
 
-    def __init__(self, df, classcol="class", wv_cols=list(map(str, range(64)))):
+    def __init__(self,
+                 df,
+                 classcol="class",
+                 wv_cols=list(map(str, range(64)))):
         """Initializes a dataset that can be processed by neural networks.
 
         :param df: The dataframe containing the waveforms

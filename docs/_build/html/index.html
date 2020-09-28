@@ -68,7 +68,7 @@ defaults to (5, 15)</p></li>
 
 <dl class="py method">
 <dt id="deepwaveform.ConvNet.annotate_dataframe">
-<code class="sig-name descname">annotate_dataframe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">wv_cols</span><span class="o">=</span><span class="default_value">[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]</span></em>, <em class="sig-param"><span class="n">class_label_mapping</span><span class="o">=</span><span class="default_value">['Land', 'Water']</span></em>, <em class="sig-param"><span class="n">predicted_column</span><span class="o">=</span><span class="default_value">'Predicted'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deepwaveform.ConvNet.annotate_dataframe" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">annotate_dataframe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">wv_cols</span><span class="o">=</span><span class="default_value">['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '60', '61', '62', '63']</span></em>, <em class="sig-param"><span class="n">class_label_mapping</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">predicted_column</span><span class="o">=</span><span class="default_value">'predicted'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deepwaveform.ConvNet.annotate_dataframe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Annotates a dataframe containing waveforms with the estimated
 classes and respective probability estimates.</p>
 <dl class="field-list simple">
@@ -76,11 +76,11 @@ classes and respective probability estimates.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Dataframe with waveforms</p></li>
 <li><p><strong>wv_cols</strong> (<em>list</em><em>, </em><em>optional</em>) – List of column names containing the waveforms,
-defaults to list(range(64))</p></li>
+defaults to list(map(str, range(64)))</p></li>
 <li><p><strong>class_label_mapping</strong> (<em>list</em><em>, </em><em>optional</em>) – New columns for probability estimates,
-defaults to [“Land”, “Water”]</p></li>
+defaults to None</p></li>
 <li><p><strong>predicted_column</strong> (<em>str</em><em>, </em><em>optional</em>) – New column for class estimates,
-defaults to “Predicted”</p></li>
+defaults to “predicted”</p></li>
 </ul>
 </dd>
 </dl>
@@ -99,8 +99,8 @@ one hidden and 2 decoding layers.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>layer1</strong> (<em>int</em><em>, </em><em>optional</em>) – Dimension of first/last layer, defaults to 64</p></li>
-<li><p><strong>layer2</strong> (<em>int</em><em>, </em><em>optional</em>) – Dimension of second/fourth, defaults to 32</p></li>
+<li><p><strong>layer1</strong> (<em>int</em><em>, </em><em>optional</em>) – Dimension of first/fifth layer, defaults to 64</p></li>
+<li><p><strong>layer2</strong> (<em>int</em><em>, </em><em>optional</em>) – Dimension of second/fourth layer, defaults to 32</p></li>
 <li><p><strong>hidden</strong> (<em>int</em><em>, </em><em>optional</em>) – Dimension of hidden layer, defaults to 5</p></li>
 </ul>
 </dd>
@@ -109,7 +109,7 @@ one hidden and 2 decoding layers.</p>
 
 <dl class="py method">
 <dt id="deepwaveform.AutoEncoder.annotate_dataframe">
-<code class="sig-name descname">annotate_dataframe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">wv_cols</span><span class="o">=</span><span class="default_value">[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]</span></em>, <em class="sig-param"><span class="n">encoding_prefix</span><span class="o">=</span><span class="default_value">'hidden_'</span></em>, <em class="sig-param"><span class="n">reconstruction_prefix</span><span class="o">=</span><span class="default_value">'reconstr_'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deepwaveform.AutoEncoder.annotate_dataframe" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">annotate_dataframe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">wv_cols</span><span class="o">=</span><span class="default_value">['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '60', '61', '62', '63']</span></em>, <em class="sig-param"><span class="n">encoding_prefix</span><span class="o">=</span><span class="default_value">'hidden_'</span></em>, <em class="sig-param"><span class="n">reconstruction_prefix</span><span class="o">=</span><span class="default_value">'reconstr_'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deepwaveform.AutoEncoder.annotate_dataframe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Annotates a dataframe with the estimated encoding and
 the corresponding reconstruction.</p>
 <dl class="field-list simple">
@@ -117,7 +117,7 @@ the corresponding reconstruction.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Dataframe with waveforms</p></li>
 <li><p><strong>wv_cols</strong> (<em>list</em><em>, </em><em>optional</em>) – List of column names containing waveforms,
-defaults to list(range(64))</p></li>
+defaults to list(map(str, range(64)))</p></li>
 <li><p><strong>encoding_prefix</strong> (<em>str</em><em>, </em><em>optional</em>) – Prefix of new columns containing encoding,
 defaults to “hidden_”</p></li>
 <li><p><strong>reconstruction_prefix</strong> (<em>str</em><em>, </em><em>optional</em>) – Prefix of new columns containing
@@ -134,19 +134,12 @@ reconstruction, defaults to “reconstr_”</p></li>
 <h2>Preprocessing<a class="headerlink" href="#preprocessing" title="Permalink to this headline">¶</a></h2>
 <dl class="py method">
 <dt id="deepwaveform.preprocessing.load_dataset">
-<code class="sig-prename descclassname">preprocessing.</code><code class="sig-name descname">load_dataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">wv_cols</span><span class="o">=</span><span class="default_value">[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]</span></em>, <em class="sig-param"><span class="n">inv_z</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deepwaveform.preprocessing.load_dataset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Loads a dataset of waveforms into a pandas dataframe. Required
-columns names are id,class,x,y,z,0,…,199, where “id” marks the index,
-“class” the classification (int), “x”, “y”, “z” the position of each point
-and 0,…,199 the corresponding waveform. The file format is given as a
-csv with seperator ” “.</p>
+<code class="sig-prename descclassname">preprocessing.</code><code class="sig-name descname">load_dataset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#deepwaveform.preprocessing.load_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a dataset of waveforms into a pandas dataframe. Separator is ‘;’.
+Dataframe must be indexed by ‘index’-column”.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>filepath</strong> (<em>str</em>) – Path to file</p></li>
-<li><p><strong>wv_cols</strong> (<em>List</em><em>, </em><em>optional</em>) – Column names of waveforms, defaults to list(range(64))</p></li>
-<li><p><strong>inv_z</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether the z-axis should be inverted, defaults to True</p></li>
-</ul>
+<dd class="field-odd"><p><strong>filepath</strong> (<em>str</em>) – Path to file</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>a pandas dataframe</p>
@@ -159,14 +152,15 @@ csv with seperator ” “.</p>
 
 <dl class="py method">
 <dt id="deepwaveform.preprocessing.waveform2matrix">
-<code class="sig-prename descclassname">preprocessing.</code><code class="sig-name descname">waveform2matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">wv_cols</span><span class="o">=</span><span class="default_value">[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deepwaveform.preprocessing.waveform2matrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">preprocessing.</code><code class="sig-name descname">waveform2matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">wv_cols</span><span class="o">=</span><span class="default_value">['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '60', '61', '62', '63']</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deepwaveform.preprocessing.waveform2matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Takes a dataframe containing waveforms and returns a numpy
 matrix containing the waveforms.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Dataframe containing waveforms</p></li>
-<li><p><strong>wv_cols</strong> (<em>List</em><em>, </em><em>optional</em>) – Column names of waveforms, defaults to list(range(64))</p></li>
+<li><p><strong>wv_cols</strong> (<em>List</em><em>, </em><em>optional</em>) – Column names of waveforms,
+defaults to list(map(str, range(64)))</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -183,7 +177,7 @@ matrix containing the waveforms.</p>
 <span id="visualization"></span><h2>Visualization<a class="headerlink" href="#module-deepwaveform.visualization" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="deepwaveform.visualization.plot_waveforms">
-<code class="sig-prename descclassname">deepwaveform.visualization.</code><code class="sig-name descname">plot_waveforms</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">axis</span></em>, <em class="sig-param"><span class="n">classcol</span><span class="o">=</span><span class="default_value">'class'</span></em>, <em class="sig-param"><span class="n">class_label_mapping</span><span class="o">=</span><span class="default_value">['Land', 'Water']</span></em>, <em class="sig-param"><span class="n">class_style_mapping</span><span class="o">=</span><span class="default_value">['g-', 'b--']</span></em>, <em class="sig-param"><span class="n">wv_cols</span><span class="o">=</span><span class="default_value">[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deepwaveform.visualization.plot_waveforms" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">deepwaveform.visualization.</code><code class="sig-name descname">plot_waveforms</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">axis</span></em>, <em class="sig-param"><span class="n">classcol</span><span class="o">=</span><span class="default_value">'class'</span></em>, <em class="sig-param"><span class="n">class_label_mapping</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">class_style_mapping</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">wv_cols</span><span class="o">=</span><span class="default_value">['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '60', '61', '62', '63']</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deepwaveform.visualization.plot_waveforms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots the waveforms of a dataframe.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -191,11 +185,12 @@ matrix containing the waveforms.</p>
 <li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – The dataframe containing the waveforms.</p></li>
 <li><p><strong>axis</strong> (<em>matplotlib.axes.Axes</em>) – The matplotlib-axis the waveforms should be plotted on</p></li>
 <li><p><strong>classcol</strong> (<em>str</em><em>, </em><em>optional</em>) – Column containing class of waveform, defaults to “class”</p></li>
-<li><p><strong>class_label_mapping</strong> (<em>list</em><em>, </em><em>optional</em>) – List linking class index and class names,
-defaults to [“Land”, “Water”]</p></li>
-<li><p><strong>class_style_mapping</strong> (<em>list</em><em>, </em><em>optional</em>) – List linking class index and waveform style,
-defaults to [“g-“, “b–”]</p></li>
-<li><p><strong>wv_cols</strong> (<em>List</em><em>, </em><em>optional</em>) – Columns containing waveforms, defaults to list(range(64))</p></li>
+<li><p><strong>class_label_mapping</strong> (<em>list</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) – List linking class index and class names,
+defaults to None</p></li>
+<li><p><strong>class_style_mapping</strong> (<em>list</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) – List linking class index and waveform style,
+defaults to None</p></li>
+<li><p><strong>wv_cols</strong> (<em>List</em><em>, </em><em>optional</em>) – Columns containing waveforms,
+defaults to list(map(str, range(64)))</p></li>
 </ul>
 </dd>
 </dl>
@@ -203,7 +198,7 @@ defaults to [“g-“, “b–”]</p></li>
 
 <dl class="py function">
 <dt id="deepwaveform.visualization.plot_pcl">
-<code class="sig-prename descclassname">deepwaveform.visualization.</code><code class="sig-name descname">plot_pcl</code><span class="sig-paren">(</span><em class="sig-param">df</em>, <em class="sig-param">axis</em>, <em class="sig-param">targetcol='class'</em>, <em class="sig-param">colormap=&lt;matplotlib.colors.LinearSegmentedColormap object&gt;</em>, <em class="sig-param">xcol='x'</em>, <em class="sig-param">ycol='y'</em>, <em class="sig-param">zcol='z'</em><span class="sig-paren">)</span><a class="headerlink" href="#deepwaveform.visualization.plot_pcl" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">deepwaveform.visualization.</code><code class="sig-name descname">plot_pcl</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">axis</span></em>, <em class="sig-param"><span class="n">targetcol</span><span class="o">=</span><span class="default_value">'class'</span></em>, <em class="sig-param"><span class="n">class_label_mapping</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">colors</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xcol</span><span class="o">=</span><span class="default_value">'x'</span></em>, <em class="sig-param"><span class="n">ycol</span><span class="o">=</span><span class="default_value">'y'</span></em>, <em class="sig-param"><span class="n">zcol</span><span class="o">=</span><span class="default_value">'z'</span></em>, <em class="sig-param"><span class="n">use_plotly</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">inv_z</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deepwaveform.visualization.plot_pcl" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots a pointcloud from a dataframe.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -211,11 +206,15 @@ defaults to [“g-“, “b–”]</p></li>
 <li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – dataframe containing points</p></li>
 <li><p><strong>axis</strong> (<em>matplotlib.axes.Axes</em>) – The matplotlib-axis the pointcloud should be plotted on</p></li>
 <li><p><strong>targetcol</strong> (<em>str</em><em>, </em><em>optional</em>) – Column containing class of waveform, defaults to “class”</p></li>
-<li><p><strong>colormap</strong> (<em>matplotlib.colors.Colormap</em><em>, </em><em>optional</em>) – Colormap mapping class index to color,
-defaults to cm.coolwarm</p></li>
+<li><p><strong>class_label_mapping</strong> (<em>list</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) – List linking class index and class names,
+defaults to None</p></li>
+<li><p><strong>colors</strong> (<em>list</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) – Colors mapping class index to color,
+defaults to None</p></li>
 <li><p><strong>xcol</strong> (<em>str</em><em>, </em><em>optional</em>) – Column containing x-position, defaults to “x”</p></li>
 <li><p><strong>ycol</strong> (<em>str</em><em>, </em><em>optional</em>) – Column containing y-position, defaults to “y”</p></li>
 <li><p><strong>zcol</strong> (<em>str</em><em>, </em><em>optional</em>) – Column containing z-position, defaults to “z”</p></li>
+<li><p><strong>use_plotly</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether plotly should be used for plotting or not</p></li>
+<li><p><strong>inv_z</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether the z-axis should be inverted.</p></li>
 </ul>
 </dd>
 </dl>
@@ -223,7 +222,7 @@ defaults to cm.coolwarm</p></li>
 
 <dl class="py function">
 <dt id="deepwaveform.visualization.plot_pcl_prediction">
-<code class="sig-prename descclassname">deepwaveform.visualization.</code><code class="sig-name descname">plot_pcl_prediction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">axis</span></em>, <em class="sig-param"><span class="n">probabilities_col</span><span class="o">=</span><span class="default_value">['Land', 'Water']</span></em>, <em class="sig-param"><span class="n">colors</span><span class="o">=</span><span class="default_value">['green', 'blue']</span></em>, <em class="sig-param"><span class="n">xcol</span><span class="o">=</span><span class="default_value">'x'</span></em>, <em class="sig-param"><span class="n">ycol</span><span class="o">=</span><span class="default_value">'y'</span></em>, <em class="sig-param"><span class="n">zcol</span><span class="o">=</span><span class="default_value">'z'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deepwaveform.visualization.plot_pcl_prediction" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">deepwaveform.visualization.</code><code class="sig-name descname">plot_pcl_prediction</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">axis</span></em>, <em class="sig-param"><span class="n">probabilities_col</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">colors</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">xcol</span><span class="o">=</span><span class="default_value">'x'</span></em>, <em class="sig-param"><span class="n">ycol</span><span class="o">=</span><span class="default_value">'y'</span></em>, <em class="sig-param"><span class="n">zcol</span><span class="o">=</span><span class="default_value">'z'</span></em>, <em class="sig-param"><span class="n">use_plotly</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">inv_z</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deepwaveform.visualization.plot_pcl_prediction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots the pointcloud of a dataframe with interpolated coloring,
 dependent on probability estimates of corresponding classes.</p>
 <dl class="field-list simple">
@@ -232,12 +231,14 @@ dependent on probability estimates of corresponding classes.</p>
 <li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – dataframe containing points and probability estimates.</p></li>
 <li><p><strong>axis</strong> (<em>matplotlib.axes.Axes</em>) – The matplotlib-axis the pointcloud should be plotted on</p></li>
 <li><p><strong>probabilities_col</strong> (<em>list</em><em>, </em><em>optional</em>) – Columns with probability estimates,
-defaults to [“Land”, “Water”]</p></li>
+defaults to None</p></li>
 <li><p><strong>colors</strong> (<em>list</em><em>, </em><em>optional</em>) – Colors associates with probability estimates,
-defaults to [“green”, “blue”]</p></li>
+defaults to None</p></li>
 <li><p><strong>xcol</strong> (<em>str</em><em>, </em><em>optional</em>) – Column containing x-position, defaults to “x”</p></li>
 <li><p><strong>ycol</strong> (<em>str</em><em>, </em><em>optional</em>) – Column containing y-position, defaults to “y”</p></li>
 <li><p><strong>zcol</strong> (<em>str</em><em>, </em><em>optional</em>) – Column containing z-position, defaults to “z”</p></li>
+<li><p><strong>use_plotly</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether plotly should be used for plotting or not</p></li>
+<li><p><strong>inv_z</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether the z-axis should be inverted.</p></li>
 </ul>
 </dd>
 </dl>
@@ -281,10 +282,10 @@ defaults to [“Land”, “Water”]</p></li>
 <h2>Dataset and Training<a class="headerlink" href="#dataset-and-training" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="deepwaveform.WaveFormDataset">
-<em class="property">class </em><code class="sig-prename descclassname">deepwaveform.</code><code class="sig-name descname">WaveFormDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">classcol</span><span class="o">=</span><span class="default_value">'class'</span></em>, <em class="sig-param"><span class="n">wv_cols</span><span class="o">=</span><span class="default_value">[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deepwaveform.WaveFormDataset" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">deepwaveform.</code><code class="sig-name descname">WaveFormDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">classcol</span><span class="o">=</span><span class="default_value">'class'</span></em>, <em class="sig-param"><span class="n">wv_cols</span><span class="o">=</span><span class="default_value">['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '60', '61', '62', '63']</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deepwaveform.WaveFormDataset" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="py method">
 <dt id="deepwaveform.WaveFormDataset.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">classcol</span><span class="o">=</span><span class="default_value">'class'</span></em>, <em class="sig-param"><span class="n">wv_cols</span><span class="o">=</span><span class="default_value">[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63]</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deepwaveform.WaveFormDataset.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">classcol</span><span class="o">=</span><span class="default_value">'class'</span></em>, <em class="sig-param"><span class="n">wv_cols</span><span class="o">=</span><span class="default_value">['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '60', '61', '62', '63']</span></em><span class="sig-paren">)</span><a class="headerlink" href="#deepwaveform.WaveFormDataset.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initializes a dataset that can be processed by neural networks.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -294,7 +295,7 @@ defaults to [“Land”, “Water”]</p></li>
 If <cite>None</cite> then class of waveform is ignored – e.g. when it comes
 to autoencoders, defaults to “class”</p></li>
 <li><p><strong>wv_cols</strong> (<em>list</em><em>, </em><em>optional</em>) – Columns dataframe containing waveforms,
-defaults to list(range(64))</p></li>
+defaults to list(map(str, range(64)))</p></li>
 </ul>
 </dd>
 </dl>
