@@ -1,3 +1,6 @@
+![cluster](./pics/cluster.png)
+K-Means-Clustering über ganze/kodierte Waveforms
+
 ## Dokumentation
 Kann unter https://graps1.github.io/deepwaveform/_build/html/index.html gefunden werden.
 
