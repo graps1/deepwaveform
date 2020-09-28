@@ -1,13 +1,13 @@
 import pandas as pd
 import numpy as np
 
+
 def load_dataset(filepath):
-    """Loads a dataset of waveforms into a pandas dataframe.".
+    """Loads a dataset of waveforms into a pandas dataframe. Separator is ';'.
+    Dataframe must be indexed by 'index'-column".
 
     :param filepath: Path to file
     :type filepath: str
-    :param inv_z: Whether the z-axis should be inverted, defaults to True
-    :type inv_z: bool, optional
     :return: a pandas dataframe
     :rtype: pandas.DataFrame
     """
@@ -21,7 +21,8 @@ def waveform2matrix(df, wv_cols=list(map(str, range(64)))):
 
     :param df: Dataframe containing waveforms
     :type df: pandas.DataFrame
-    :param wv_cols: Column names of waveforms, defaults to list(map(str, range(64)))
+    :param wv_cols: Column names of waveforms,
+        defaults to list(map(str, range(64)))
     :type wv_cols: List, optional
     :return: a [#samples]x[#waveform_dimension]-matrix
     :rtype: np.ndarray

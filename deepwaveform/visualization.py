@@ -22,19 +22,21 @@ def plot_waveforms(df,
     :param classcol: Column containing class of waveform, defaults to "class"
     :type classcol: str, optional
     :param class_label_mapping: List linking class index and class names,
-        defaults to ["Land", "Water"]
-    :type class_label_mapping: list, optional
+        defaults to None
+    :type class_label_mapping: list[str], optional
     :param class_style_mapping: List linking class index and waveform style,
-        defaults to ["g-", "b--"]
-    :type class_style_mapping: list, optional
-    :param wv_cols: Columns containing waveforms, defaults to list(map(str, range(64)))
+        defaults to None
+    :type class_style_mapping: list[str], optional
+    :param wv_cols: Columns containing waveforms,
+        defaults to list(map(str, range(64)))
     :type wv_cols: List, optional
     """
     if class_label_mapping is None:
-        class_label_mapping = [col for col in df.columns if col.startswith("pred_")]
+        class_label_mapping = list(map(str, range(max(df[classcol])+1)))
     if class_style_mapping is None:
-        class_style_mapping = ["b-", "g--", "r-", "c--", "m-", "y--", 
-                  "k-", "b--", "g-", "r--"][:len(class_label_mapping)]
+        class_style_mapping = [
+            "b-", "g--", "r-", "c--", "m-", "y--",
+            "k-", "b--", "g-", "r--"][:len(class_label_mapping)]
     # get waveforms in matrix form
     waveforms = waveform2matrix(df, wv_cols=wv_cols)
     # set up figure
@@ -85,6 +87,7 @@ def plot_pcl(df,
     :type targetcol: str, optional
     :param class_label_mapping: List linking class index and class names,
         defaults to None
+    :type class_label_mapping: list[str], optional
     :param colors: Colors mapping class index to color,
         defaults to None
     :type colors: list[str], optional
@@ -96,6 +99,8 @@ def plot_pcl(df,
     :type zcol: str, optional
     :param use_plotly: Whether plotly should be used for plotting or not
     :type use_plotly: bool, optional
+    :param inv_z: Whether the z-axis should be inverted.
+    :type inv_z: bool, optional
     """
     if class_label_mapping is None:
         class_label_mapping = list(map(str, range(max(df[targetcol])+1)))
@@ -182,11 +187,13 @@ def plot_pcl_prediction(df,
     :type zcol: str, optional
     :param use_plotly: Whether plotly should be used for plotting or not
     :type use_plotly: bool, optional
+    :param inv_z: Whether the z-axis should be inverted.
+    :type inv_z: bool, optional
     """
     if probabilities_col is None:
-        probabilities_col = [col for col in df.columns if col.startswith("pred_")]
+        probabilities_col = [col for col in df.columns if "pred_" in col]
     if colors is None:
-        colors = ["blue", "orange", "green", "red", "purple", "brown", 
+        colors = ["blue", "orange", "green", "red", "purple", "brown",
                   "pink", "gray", "olive", "cyan"][:len(probabilities_col)]
 
     probarr = np.array(df[probabilities_col])
@@ -226,11 +233,12 @@ def plot_pcl_prediction(df,
     else:
         # initialize 3d-plot
         axis.scatter(df[xcol], df[ycol], (-1 if inv_z else 1)*df[zcol],
-                    color=colorsarr,
-                    marker=".", s=0.7)
+                     color=colorsarr,
+                     marker=".", s=0.7)
 
         for color, classname in zip(colors, probabilities_col):
-            axis.add_line(plt.Line2D([0], [0], color=color, label=classname, lw=4))
+            axis.add_line(plt.Line2D(
+                [0], [0], color=color, label=classname, lw=4))
 
         legend = axis.legend(loc="lower left", title="Classes")
         axis.add_artist(legend)
