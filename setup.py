@@ -12,7 +12,6 @@ setup(
 
     install_requires=[
         "matplotlib",
-        "torch",
         "numpy",
         "plotly",
         "scikit-learn",

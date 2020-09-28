@@ -2,6 +2,7 @@
 Kann unter https://graps1.github.io/deepwaveform/_build/html/index.html gefunden werden.
 
 ## Abhängigkeiten
+Pytorch muss manuell (siehe [hier](https://pytorch.org/get-started/locally/)) installiert werden. Alles andere sollte durch die Installation von diesem Paket mitinstalliert werden.
 * pytorch
 * setuptools
 * pandas
@@ -12,7 +13,7 @@ Kann unter https://graps1.github.io/deepwaveform/_build/html/index.html gefunden
 * für die Beispiele: jupyter notebook
 
 ## Installation
-Unter Linux: `sudo python3 setup.py install` aufrufen.
+Unter Linux: `sudo python3 setup.py install` aufrufen. Unter Windows: `python setup.py install` aufrufen. Das Kommandozeilentool befindet sich im `scripts`-Unterordner und wird nur unter Linux richtig im System installiert. Unter Windows funktioniert das Tool aber trotzdem und kann bspw. mit `python scripts\dwf --help` aufgerufen werden.
 
 ## Benutzung
 ### Datenformat
@@ -47,7 +48,7 @@ Um die Beispiele ausführen zu können, müssen zuerst ein paar Datensätze heru
 * Vergleich der gefundenen Cluster
 * Visualisierung der Zentroiden
 
-### Command Line Tool
+### Kommandozeilentool
 Nach der Installation und dem Download der Datensätze (s.o.) können bspw. folgende Kommandos in der Kommandozeile ausgeführt werden:
 
 #### Klassifikator trainieren und Datensatz annotieren
@@ -74,7 +75,3 @@ Wenn ein Autoencoder trainiert und der Datensatz entsprechend annotiert wurde:
     dwf cluster elbabschnitt.encoded.csv -f="['hidden_%d' % idx for idx in range(12)]" -o="elbabschnitt.encoded.clusteredhidden.csv" -cc=5
     dwf renderclass elbabschnitt.encoded.clusteredwaveforms.csv -c="cluster"
     dwf renderclass elbabschnitt.encoded.clusteredhidden.csv -c="cluster"
-
-
-## Todo
-* Windows-Installation
