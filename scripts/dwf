@@ -91,52 +91,65 @@ def renderprob(args):
 parser = argparse.ArgumentParser(
     formatter_class=argparse.RawDescriptionHelpFormatter)
 
-subparsers = parser.add_subparsers()
-parser_train = subparsers.add_parser("train")
-parser_annotate = subparsers.add_parser("annotate")
-parser_cluster = subparsers.add_parser("cluster")
-parser_renderclass = subparsers.add_parser("renderclass")
-parser_renderprob = subparsers.add_parser("renderprob")
+subparsers = parser.add_subparsers(
+    description="Tool for training classifiers and autoencoders on full-length waveform-datasets, annotating datasets with estimated classes/encodings, clustering datasets and visualizing results.")
+parser_train = subparsers.add_parser("train", description="Trains a network on a dataset.")
+parser_annotate = subparsers.add_parser("annotate",
+    description="Annotates a dataset with predicted classes/encodings.")
+parser_cluster = subparsers.add_parser("cluster",
+    description="Clusters a dataset into multiple partitions. Adds a new 'cluster'-column that contains the predicted cluster index for each element.")
+parser_renderclass = subparsers.add_parser("renderclass",
+    description="Renders the elements of a dataset as a point cloud dependent on their corresponding class.")
+parser_renderprob = subparsers.add_parser("renderprob",
+    description="Given a dataset annotated by a classifier with probability estimates for each class, renders the elements of this dataset as a point cloud dependent on their corresponding probability estimates.")
 
-parser_train.add_argument("type", choices=["classifier", "autoencoder"])
-parser_train.add_argument("target")
-parser_train.add_argument("--output", "-o", default="model.pt")
-parser_train.add_argument("--epochs", "-e", default=20, type=int)
-parser_train.add_argument("--batch_size", "-bs", default=128, type=int)
-parser_train.add_argument("--classcol", "-c", default="class")
-parser_train.add_argument("--hiddendim", "-hd", default=12, type=int)
+parser_train.add_argument("type", choices=["classifier", "autoencoder"],
+    help="The model type that should be trained.")
+parser_train.add_argument("target", help="The dataset (.csv-format).")
+parser_train.add_argument("--output", "-o", default="model.pt",
+    help="Where to store the model.")
+parser_train.add_argument("--epochs", "-e", default=20, type=int,
+    help="Number of epochs the model should be trained.")
+parser_train.add_argument("--batch_size", "-bs", default=128, type=int,
+    help="Batch size per epoch.")
+parser_train.add_argument("--classcol", "-c", default="class",
+    help="[Classifier only] Column in dataset that stores the class.")
+parser_train.add_argument("--hiddendim", "-hd", default=12, type=int,
+    help="[Autoencoder only] Size of hidden dimension.")
 parser_train.set_defaults(func=train)
 
-parser_annotate.add_argument("target")
-parser_annotate.add_argument("model")
-parser_annotate.add_argument("--output", "-o", default=None)
-parser_annotate.add_argument("--labels", "-l", default="None")
+parser_annotate.add_argument("target", help="The dataset (.csv-format).")
+parser_annotate.add_argument("model", help="The model used to annotate the dataset.")
+parser_annotate.add_argument("--output", "-o", default=None, 
+    help="Where to store the annotated dataset.")
+parser_annotate.add_argument("--labels", "-l", default="None", 
+    help="[Classifier only] Python code that returns a list which contains labels for each class.")
 parser_annotate.set_defaults(func=annotate)
 
-parser_cluster.add_argument("target")
-parser_cluster.add_argument("--features", "-f", default="list(map(str, range(64)))")
-parser_cluster.add_argument("--output", "-o", default=None)
-parser_cluster.add_argument("--clustercount", "-cc", default=8, type=int)
+parser_cluster.add_argument("target", help="The dataset (.csv-format).")
+parser_cluster.add_argument("--features", "-f", default="list(map(str, range(64)))", 
+    help="Python code that returns a list which contains the column names of the features that should be used. Default is '%(default)s', which corresponds to the standard waveform columns.")
+parser_cluster.add_argument("--output", "-o", default=None, 
+    help="Where to store the clustered dataset.")
+parser_cluster.add_argument("--clustercount", "-cc", default=8, type=int,
+    help="Number of clusters.")
 parser_cluster.set_defaults(func=cluster)
 
-parser_renderclass.add_argument("target")
-parser_renderclass.add_argument("--classcol", "-c", default="class")
-parser_renderclass.add_argument("--labels", "-l", default="None")
-parser_renderclass.add_argument("--colors", "-co", default="None")
+parser_renderclass.add_argument("target", help="The dataset (.csv-format).")
+parser_renderclass.add_argument("--classcol", "-c", default="class",
+    help="Column in dataset that indicates the class.")
+parser_renderclass.add_argument("--labels", "-l", default="None",
+    help="Python code that returns a list of labels for each class.")
+parser_renderclass.add_argument("--colors", "-co", default="None",
+    help="Python code that returns a list of colors for each class.")
 parser_renderclass.set_defaults(func=renderclass)
 
-parser_renderprob.add_argument("target")
-parser_renderprob.add_argument("--probcols", "-pc", default="None")
-parser_renderprob.add_argument("--colors", "-co", default="None")
+parser_renderprob.add_argument("target", help="The dataset (.csv-format).")
+parser_renderprob.add_argument("--probcols", "-pc", default="None", 
+    help="Python code that returns a list of columns that contain the probability estimates for each class.")
+parser_renderprob.add_argument("--colors", "-co", default="None",
+    help="Python code that returns a list of colors for each class.")
 parser_renderprob.set_defaults(func=renderprob)
-
-# functionality
-# - train classifier on dataset
-# - annotate dataset with classes
-# - train autoencoder on dataset
-# - annotate dataset with encoding/reconstruction
-# - kmeans-clustering + annotate dataset
-# render dataset?
 
 args = parser.parse_args()
 args.func(args)
