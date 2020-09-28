@@ -9,6 +9,7 @@ distribute.egg-info
 deepwaveform.egg-info
 .coverage
 .eggs
+.vscode
 .tox
 .venv
 *.egg
