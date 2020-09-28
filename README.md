@@ -7,7 +7,7 @@ Kann unter https://graps1.github.io/deepwaveform/_build/html/index.html gefunden
 * pandas
 * matplotlib
 * numpy
-* sklearn
+* scikit-learn
 * python >=3.5
 * für die Beispiele: jupyter notebook
 
