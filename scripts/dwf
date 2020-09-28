@@ -1,0 +1,142 @@
+#!/usr/bin/env python3
+
+import argparse
+import deepwaveform as dwf
+import torch
+
+def train(args):
+    print("loading dataset...")
+    df = dwf.load_dataset(args.target)
+    model, trainerfunc = None, None
+
+    if args.type == "classifier":
+        classcount = max(df[args.classcol])+1
+        model = dwf.ConvNet(output_dimension=classcount)
+        ds = dwf.WaveFormDataset(df, classcol=args.classcol)
+        trainer = dwf.Trainer(model,
+                              ds, optimizer=None,
+                              batch_size=args.batch_size,
+                              epochs=args.epochs)
+        trainerfunc = trainer.train_classifier
+    if args.type == "autoencoder":
+        model = dwf.AutoEncoder(hidden=args.hiddendim)
+        ds = dwf.WaveFormDataset(df, classcol=None)
+        trainer = dwf.Trainer(model,
+                              ds, optimizer=None,
+                              batch_size=args.batch_size,
+                              epochs=args.epochs)
+        trainerfunc = trainer.train_autoencoder
+
+    print("initializing training process...")
+    for epoch, result in enumerate(trainerfunc(), start=1):
+        print("\tepoch=%s p=%.3f loss=%.4f" % (
+            str(epoch).zfill(3),
+            epoch/args.epochs,
+            result["meanloss"]))
+    print("storing model...")
+    torch.save(model, args.output)
+
+
+def annotate(args):
+    print("loading dataset...")
+    df = dwf.load_dataset(args.target)
+    if args.output is None:
+        args.output = args.target[:-4] + ".annotated.csv"
+    print("loading model...")
+    model = torch.load(args.model)
+    model.eval()
+    print("annotating & storing dataframe...")
+    if isinstance(model, dwf.ConvNet):
+        model.annotate_dataframe(df, class_label_mapping=eval(args.labels))
+    else:
+        model.annotate_dataframe(df)
+    df.to_csv(args.output, sep=";")
+
+
+def cluster(args):
+    print("loading dataset...")
+    df = dwf.load_dataset(args.target)
+    if args.output is None:
+        args.output = args.target[:-4] + ".clustered.csv"
+    from sklearn.cluster import KMeans
+    print("calculating clusters...")
+    mat = dwf.waveform2matrix(df, wv_cols=eval(args.features))
+    kmeans = KMeans(n_clusters=args.clustercount).fit(mat)
+    df["cluster"] = kmeans.labels_
+    print("annotating & storing dataframe...")
+    df.to_csv(args.output, sep=";")
+
+
+def renderclass(args):
+    print("loading dataset...")
+    df = dwf.load_dataset(args.target)
+    import matplotlib.pyplot as plt
+    dwf.plot_pcl(df, None, 
+                 targetcol=args.classcol,
+                 class_label_mapping=eval(args.labels),
+                 colors=eval(args.colors),
+                 use_plotly=True)
+
+
+def renderprob(args):
+    print("loading dataset...")
+    df = dwf.load_dataset(args.target)
+    import matplotlib.pyplot as plt
+    dwf.plot_pcl_prediction(df, None, 
+                 probabilities_col=eval(args.probcols),
+                 colors=eval(args.colors),
+                 use_plotly=True)
+
+
+parser = argparse.ArgumentParser(
+    formatter_class=argparse.RawDescriptionHelpFormatter)
+
+subparsers = parser.add_subparsers()
+parser_train = subparsers.add_parser("train")
+parser_annotate = subparsers.add_parser("annotate")
+parser_cluster = subparsers.add_parser("cluster")
+parser_renderclass = subparsers.add_parser("renderclass")
+parser_renderprob = subparsers.add_parser("renderprob")
+
+parser_train.add_argument("type", choices=["classifier", "autoencoder"])
+parser_train.add_argument("target")
+parser_train.add_argument("--output", "-o", default="model.pt")
+parser_train.add_argument("--epochs", "-e", default=20, type=int)
+parser_train.add_argument("--batch_size", "-bs", default=128, type=int)
+parser_train.add_argument("--classcol", "-c", default="class")
+parser_train.add_argument("--hiddendim", "-hd", default=12, type=int)
+parser_train.set_defaults(func=train)
+
+parser_annotate.add_argument("target")
+parser_annotate.add_argument("model")
+parser_annotate.add_argument("--output", "-o", default=None)
+parser_annotate.add_argument("--labels", "-l", default="None")
+parser_annotate.set_defaults(func=annotate)
+
+parser_cluster.add_argument("target")
+parser_cluster.add_argument("--features", "-f", default="list(map(str, range(64)))")
+parser_cluster.add_argument("--output", "-o", default=None)
+parser_cluster.add_argument("--clustercount", "-cc", default=8, type=int)
+parser_cluster.set_defaults(func=cluster)
+
+parser_renderclass.add_argument("target")
+parser_renderclass.add_argument("--classcol", "-c", default="class")
+parser_renderclass.add_argument("--labels", "-l", default="None")
+parser_renderclass.add_argument("--colors", "-co", default="None")
+parser_renderclass.set_defaults(func=renderclass)
+
+parser_renderprob.add_argument("target")
+parser_renderprob.add_argument("--probcols", "-pc", default="None")
+parser_renderprob.add_argument("--colors", "-co", default="None")
+parser_renderprob.set_defaults(func=renderprob)
+
+# functionality
+# - train classifier on dataset
+# - annotate dataset with classes
+# - train autoencoder on dataset
+# - annotate dataset with encoding/reconstruction
+# - kmeans-clustering + annotate dataset
+# render dataset?
+
+args = parser.parse_args()
+args.func(args)

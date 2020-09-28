@@ -5,6 +5,7 @@ setup(
     name="deepwaveform",
     version="0.1",
     packages=find_packages(),
+    scripts=['scripts/dwf'],
 
     author="Hans Harder",
     author_email="hans.harder@mailbox.tu-dresden.de",

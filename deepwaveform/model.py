@@ -48,7 +48,7 @@ class ConvNet(nn.Module):
         )
 
         self.classifier = nn.Sequential(
-            nn.Linear(layer2[0]*(input_dimension/4), output_dimension),
+            nn.Linear(layer2[0]*(input_dimension//4), output_dimension),
         )
 
     def forward(self, x):
@@ -62,24 +62,27 @@ class ConvNet(nn.Module):
     def predict(self, x):
         return F.softmax(self(x).data, dim=1).numpy()
 
-    def annotate_dataframe(self, df, wv_cols=list(range(64)),
-                           class_label_mapping=["Land", "Water"],
-                           predicted_column="Predicted"):
+    def annotate_dataframe(self, df, wv_cols=list(map(str, range(64))),
+                           class_label_mapping=None,
+                           predicted_column="predicted"):
         """Annotates a dataframe containing waveforms with the estimated
         classes and respective probability estimates.
 
         :param df: Dataframe with waveforms
         :type df: pandas.DataFrame
         :param wv_cols: List of column names containing the waveforms,
-            defaults to list(range(64))
+            defaults to list(map(str, range(64)))
         :type wv_cols: list, optional
         :param class_label_mapping: New columns for probability estimates,
-            defaults to ["Land", "Water"]
+            defaults to None
         :type class_label_mapping: list, optional
         :param predicted_column: New column for class estimates,
-            defaults to "Predicted"
+            defaults to "predicted"
         :type predicted_column: str, optional
         """
+        if class_label_mapping is None:
+            class_label_mapping = ["pred_%d" % idx for idx in range(self.output_dimension)]
+
         # adds new columns to dataframe
         ds = WaveFormDataset(df,
                              classcol=None,
@@ -135,7 +138,7 @@ class AutoEncoder(nn.Module):
         out = self.decoder(out)
         return out
 
-    def annotate_dataframe(self, df, wv_cols=list(range(64)),
+    def annotate_dataframe(self, df, wv_cols=list(map(str, range(64))),
                            encoding_prefix="hidden_",
                            reconstruction_prefix="reconstr_"):
         """Annotates a dataframe with the estimated encoding and
@@ -144,7 +147,7 @@ class AutoEncoder(nn.Module):
         :param df: Dataframe with waveforms
         :type df: pandas.DataFrame
         :param wv_cols: List of column names containing waveforms,
-            defaults to list(range(64))
+            defaults to list(map(str, range(64)))
         :type wv_cols: list, optional
         :param encoding_prefix: Prefix of new columns containing encoding,
             defaults to "hidden\_"
@@ -153,7 +156,7 @@ class AutoEncoder(nn.Module):
             reconstruction, defaults to "reconstr\_"
         :type reconstruction_prefix: str, optional
         """
-        ds = WaveFormDataset(df, classcol=None, wv_cols=list(range(64)))
+        ds = WaveFormDataset(df, classcol=None, wv_cols=list(map(str, range(64))))
         hidden = self.encoder(ds[:]["waveform"])
         output = self.decoder(hidden).detach().numpy()
         hidden = hidden.detach().numpy()
@@ -167,7 +170,7 @@ class AutoEncoder(nn.Module):
 
 class WaveFormDataset(Dataset):
 
-    def __init__(self, df, classcol="class", wv_cols=list(range(64))):
+    def __init__(self, df, classcol="class", wv_cols=list(map(str, range(64)))):
         """Initializes a dataset that can be processed by neural networks.
 
         :param df: The dataframe containing the waveforms
@@ -177,7 +180,7 @@ class WaveFormDataset(Dataset):
             to autoencoders, defaults to "class"
         :type classcol: str, optional
         :param wv_cols: Columns dataframe containing waveforms,
-            defaults to list(range(64))
+            defaults to list(map(str, range(64)))
         :type wv_cols: list, optional
         """
         super(WaveFormDataset, self).__init__()
