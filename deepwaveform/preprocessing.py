@@ -2,17 +2,35 @@ import pandas as pd
 import numpy as np
 
 
-def load_dataset(filepath):
-    """Loads a dataset of waveforms into a pandas dataframe. Separator is ';'.
-    Dataframe must be indexed by 'index'-column".
+def load_dataset(filepath, samplesize=None, chunksize=None):
+    """Returns an iterator over chunks of a dataset of waveforms as pandas dataframes. Separator is ';'. Dataframe must be indexed by 'index'-column".
 
     :param filepath: Path to file
     :type filepath: str
+    :param samplesize: Sample size. if None, then all is loaded
+    :type samplesize: int
+    :param chunksize: Size of loaded chunks. if None, then all is loaded in one chunk
+    :type chunksize: int
     :return: a pandas dataframe
     :rtype: pandas.DataFrame
     """
-    data = pd.read_csv(filepath, sep=";", index_col="index")
-    return data
+    skip = None
+    if samplesize is not None:
+        import random
+        row_count = sum(1 for line in open(filepath))-1
+        skip = sorted(random.sample(range(1,row_count+1),row_count-samplesize))
+
+    call = pd.read_csv(filepath,
+                    sep=";",
+                    index_col="index",
+                    skiprows=skip,
+                    chunksize=chunksize)
+
+    if chunksize is not None:
+        for chunk in call:
+            yield chunk
+    else:
+        yield call
 
 
 def waveform2matrix(df, wv_cols=list(map(str, range(64)))):
