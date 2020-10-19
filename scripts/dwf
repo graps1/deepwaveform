@@ -6,7 +6,7 @@ import torch
 
 def train(args):
     print("loading dataset...")
-    df = dwf.load_dataset(args.target)
+    df = next(dwf.load_dataset(args.target))
     model, trainerfunc = None, None
 
     if args.type == "classifier":
@@ -39,7 +39,7 @@ def train(args):
 
 def annotate(args):
     print("loading dataset...")
-    df = dwf.load_dataset(args.target)
+    df = next(dwf.load_dataset(args.target))
     if args.output is None:
         args.output = args.target[:-4] + ".annotated.csv"
     print("loading model...")
@@ -55,7 +55,7 @@ def annotate(args):
 
 def cluster(args):
     print("loading dataset...")
-    df = dwf.load_dataset(args.target)
+    df = next(dwf.load_dataset(args.target))
     if args.output is None:
         args.output = args.target[:-4] + ".clustered.csv"
     from sklearn.cluster import KMeans
@@ -69,7 +69,7 @@ def cluster(args):
 
 def renderclass(args):
     print("loading dataset...")
-    df = dwf.load_dataset(args.target)
+    df = next(dwf.load_dataset(args.target))
     import matplotlib.pyplot as plt
     dwf.plot_pcl(df, None, 
                  targetcol=args.classcol,
@@ -80,7 +80,7 @@ def renderclass(args):
 
 def renderprob(args):
     print("loading dataset...")
-    df = dwf.load_dataset(args.target)
+    df = next(dwf.load_dataset(args.target))
     import matplotlib.pyplot as plt
     dwf.plot_pcl_prediction(df, None, 
                  probabilities_col=eval(args.probcols),
